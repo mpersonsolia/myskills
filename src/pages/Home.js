@@ -1,24 +1,42 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
+  FlatList,
   Platform,
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from "react-native";
+
+import { Button } from "../components/Button";
+import { SkillCard } from "../components/SkillCard";
 
 export function Home() {
   const [newSkill, setNewSkill] = useState(""); //nova skill
   const [mySkills, setMySkills] = useState([]); //todas as skills
+  const [gretting, setGreeting] = useState("");
 
   function handleAddNewSkill() {
     setMySkills((oldState) => [...oldState, newSkill]);
   }
 
+  useEffect(() => {
+    const currentHour = new Date().getHours();
+
+    if (currentHour < 12) {
+      setGreeting("Good Morning!");
+    } else if (currentHour >= 12 && currentHour < 18) {
+      setGreeting("Good Afternon!");
+    } else {
+      setGreeting("Good Night!");
+    }
+  }, []);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}> Welcome, Maria Paula</Text>
+
+      <Text style={styles.greetings}>{gretting}</Text>
 
       <TextInput
         style={styles.input}
@@ -27,21 +45,16 @@ export function Home() {
         onChangeText={setNewSkill}
       />
 
-      <TouchableOpacity
-        style={styles.button}
-        activeOpacity={0.7}
-        onPress={handleAddNewSkill}
-      >
-        <Text style={styles.buttonText}>Add</Text>
-      </TouchableOpacity>
+      <Button onPress={handleAddNewSkill} />
 
       <Text style={[styles.title, { marginVertical: 50 }]}>My Skills</Text>
 
-      {mySkills.map((skill) => (
-        <TouchableOpacity key={skill} style={styles.buttonSkill}>
-          <Text style={styles.textSkill}>{skill}</Text>
-        </TouchableOpacity>
-      ))}
+      {/* lista de skills */}
+      <FlatList
+        data={mySkills}
+        keyExtractor={(item) => item}
+        renderItem={({ item }) => <SkillCard skill={item} />}
+      />
     </View>
   );
 }
@@ -67,28 +80,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
     borderRadius: 7,
   },
-  button: {
-    backgroundColor: "#a370f7",
-    padding: 15,
-    borderRadius: 7,
-    alignItems: "center",
-    marginTop: 20,
-  },
-  buttonText: {
+  greetings: {
     color: "#fff",
-    fontSize: 17,
-    fontWeight: "bold",
-  },
-  buttonSkill: {
-    backgroundColor: "#1f1e25",
-    padding: 15,
-    borderRadius: 50,
-    alignItems: "center",
-    marginVertical: 10,
-  },
-  textSkill: {
-    color: "#fff",
-    fontSize: 22,
-    fontWeight: "bold",
   },
 });
